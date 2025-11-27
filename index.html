@@ -3,68 +3,186 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>EF Portfolio – Feedback Generator (SCORM 1.2)</title>
+<title>EF3020 - Academic Practice - Feedback Generator</title>
 <style>
-  :root { --pad: 14px; --radius: 14px; }
-  body{font-family:system-ui,Segoe UI,Arial;margin:24px;line-height:1.45;color:#111}
-  h1{font-size:1.3rem;margin:0 0 12px}
-  fieldset{margin:16px 0;padding:var(--pad);border-radius:var(--radius);border:1px solid #e5e5e5;background:#fcfcfc}
-  legend{font-weight:600}
-  .row{margin:8px 0}
-  label{display:block;margin:8px 0}
-  input[type="range"]{width:260px;vertical-align:middle}
-  .buttons{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
-  button{padding:.6rem 1rem;border-radius:12px;border:1px solid #d0d0d0;background:#fff;cursor:pointer}
-  #output{white-space:pre-wrap;border:1px solid #e5e5e5;padding:var(--pad);border-radius:var(--radius);background:#fafafa;min-height:160px}
-  .meta{display:flex;gap:12px;flex-wrap:wrap}
-  .meta label{display:flex;align-items:center;gap:6px}
-  .muted{color:#666;font-size:.92rem}
+  :root {
+    --pad: 14px;
+    --radius: 14px;
+    --green: #0ba86a;
+    --green-dark: #07724a;
+    --green-soft: #d9f5e7;
+  }
+
+  body{
+    font-family:system-ui,Segoe UI,Arial;
+    margin:24px;
+    line-height:1.45;
+    color:#12302a;
+    background:#f4f7f5;
+  }
+  h1{
+    font-size:1.4rem;
+    margin:0 0 12px;
+    color:var(--green-dark);
+  }
+  fieldset{
+    margin:16px 0;
+    padding:var(--pad);
+    border-radius:var(--radius);
+    border:1px solid #cfe6d9;
+    background:#ffffff;
+    box-shadow:0 2px 6px rgba(0,0,0,0.04);
+  }
+  legend{
+    font-weight:600;
+    color:var(--green-dark);
+    padding:0 4px;
+  }
+  .row{margin:10px 0}
+  label{display:block;margin:6px 0}
+  input[type="range"]{
+    width:260px;
+    vertical-align:middle;
+    accent-color:var(--green);
+  }
+
+  /* Range styling */
+  input[type="range"] {
+    -webkit-appearance:none;
+    height:4px;
+    border-radius:999px;
+    background:#dfe8e2;
+    outline:none;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:var(--green);
+    border:2px solid #ffffff;
+    box-shadow:0 0 0 2px rgba(0,0,0,0.06);
+    cursor:pointer;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:var(--green);
+    border:2px solid #ffffff;
+    box-shadow:0 0 0 2px rgba(0,0,0,0.06);
+    cursor:pointer;
+  }
+  input[type="range"]::-moz-range-track{
+    height:4px;
+    background:#dfe8e2;
+    border-radius:999px;
+  }
+
+  .buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:12px 0;
+  }
+  button{
+    padding:.6rem 1.1rem;
+    border-radius:999px;
+    border:1px solid var(--green-dark);
+    background:var(--green);
+    color:#ffffff;
+    cursor:pointer;
+    font-weight:500;
+    box-shadow:0 2px 4px rgba(0,0,0,0.08);
+    transition:background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  }
+  button:hover{
+    background:var(--green-dark);
+    transform:translateY(-1px);
+    box-shadow:0 3px 6px rgba(0,0,0,0.12);
+  }
+  button:active{
+    transform:translateY(0);
+    box-shadow:0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  #output{
+    white-space:pre-wrap;
+    border:1px solid #cfe6d9;
+    padding:var(--pad);
+    border-radius:var(--radius);
+    background:#f8fbf9;
+    min-height:160px;
+    font-family:system-ui,Segoe UI,Arial;
+  }
+  .meta{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .meta label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#e4f6ec;
+  }
+  .meta input{
+    border-radius:999px;
+    border:1px solid #c7d8cf;
+    padding:4px 8px;
+  }
+
+  .muted{color:#667f74;font-size:.92rem}
   .scale-list{margin:0 0 8px 18px;padding:0}
   .scale-list li{margin-bottom:4px}
   .scale-note{font-size:.85rem;color:#555;margin:0 0 8px}
+  .inline-scale-note{font-size:.9rem;margin-top:2px}
 </style>
 <script>
 // --------------------------- Fixed template (not editable in UI) -----------------
 const DEFAULT_TEMPLATE =
-`At the end of this assessment, you should have achieved:
-MLO1: Demonstrate an understanding through the application of essential academic skills, to support success in higher education.
-MLO2: Identify and apply principles of time management, effective communication, and digital literacy in academic and professional contexts.
-MLO3: Demonstrate notetaking to plan and produce academic work. 
-MLO4: Apply research techniques to locate, evaluate, and incorporate relevant information from academic sources 
-MLO5: Demonstrate ability to reflect on personal learning and development and to identify strategies to further develop these skills.
+`<strong>At the end of this assessment, you should have achieved:</strong>
+<strong>MLO1:</strong> Demonstrate an understanding through the application of essential academic skills, to support success in higher education.
+<strong>MLO2:</strong> Identify and apply principles of time management, effective communication, and digital literacy in academic and professional contexts.
+<strong>MLO3:</strong> Demonstrate notetaking to plan and produce academic work. 
+<strong>MLO4:</strong> Apply research techniques to locate, evaluate, and incorporate relevant information from academic sources 
+<strong>MLO5:</strong> Demonstrate ability to reflect on personal learning and development and to identify strategies to further develop these skills.
 
 
-How did you meet these:
-MLO1:
+<strong>How did you meet these:</strong>
+<strong>MLO1:</strong>
 {{#list sections.MLO1.strengths bullets}}{{item}}{{/list}}
-MLO2:
+<strong>MLO2:</strong>
 {{#list sections.MLO2.strengths bullets}}{{item}}{{/list}}
-MLO3:
+<strong>MLO3:</strong>
 {{#list sections.MLO3.strengths bullets}}{{item}}{{/list}}
-MLO4:
+<strong>MLO4:</strong>
 {{#list sections.MLO4.strengths bullets}}{{item}}{{/list}}
-MLO5:
+<strong>MLO5:</strong>
 {{#list sections.MLO5.strengths bullets}}{{item}}{{/list}}
 
 
-How could you improve:
-MLO1:
+<strong>How could you improve:</strong>
+<strong>MLO1:</strong>
 {{#list sections.MLO1.improvements bullets}}{{item}}{{/list}}
-MLO2:
+<strong>MLO2:</strong>
 {{#list sections.MLO2.improvements bullets}}{{item}}{{/list}}
-MLO3:
+<strong>MLO3:</strong>
 {{#list sections.MLO3.improvements bullets}}{{item}}{{/list}}
-MLO4:
+<strong>MLO4:</strong>
 {{#list sections.MLO4.improvements bullets}}{{item}}{{/list}}
-MLO5:
+<strong>MLO5:</strong>
 {{#list sections.MLO5.improvements bullets}}{{item}}{{/list}}
 
 
-Support services:
+<strong>Support services:</strong>
 {{#list services bullets}}{{item}}{{/list}}
 
 
-First marker: {{marker}}`;
+<strong>First marker:</strong> {{marker}}`;
 
 // --------------------------- Minimal SCORM 1.2 wrapper ---------------------------
 let scormAPI = null;
@@ -101,7 +219,7 @@ function getPath(obj, path){
   return path.split('.').reduce((o,k)=> (o && k in o) ? o[k] : undefined, obj);
 }
 function renderTemplate(tpl, ctx){
-  // list blocks: {{#list sections.MLO1.strengths bullets}}{{item}}{{/list}}
+  // list blocks
   tpl = tpl.replace(/{{#list\s+([\w.]+)\s+(bullets|numbers)}}([\s\S]*?){{\/list}}/g,
     (_, path, style, inner)=>{
       const arr = getPath(ctx, path);
@@ -113,7 +231,7 @@ function renderTemplate(tpl, ctx){
       }).join("\n");
     });
 
-  // arrays with pipes (not used now, but kept for safety)
+  // arrays with pipes (kept for safety)
   tpl = tpl.replace(/{{\s*([\w.]+)\s*\|\s*(newline|semicolon|comma)\s*}}/g,
     (_, path, fmt)=>{
       const arr = getPath(ctx, path);
@@ -134,130 +252,127 @@ function renderTemplate(tpl, ctx){
 
 // --------------------------- Question bank (15 questions) -----------------------
 const QUESTIONS = [
-  // MLO1 – Essential academic skills & academic writing
-
-  { id:"mlo1_q1", mlo:"MLO1", type:"likert", min:1, max:3,
-    label:"In Portfolio Part 2 – Does their writing show a high level of academic style? (3-point scale: 3 = Yes, 2 = To some extent (requires improvement), 1 = No / not enough)",
-    rules:[
-      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 2, your writing shows a consistently high level of academic style, with an appropriately formal and academic tone." },
-      { when:v=>v===2, bucket:"improvements", text:"In Portfolio Part 2, your writing shows some features of academic style, but it needs further development to be consistently formal and discipline-appropriate." },
-      { when:v=>v===1, bucket:"improvements", text:"In Portfolio Part 2, there was limited evidence of appropriate academic style; work on using more formal language, clearer structure and avoiding conversational phrasing." }
-    ]},
-
-  { id:"mlo1_q2", mlo:"MLO1", type:"likert", min:1, max:3,
-    label:"In Portfolio Part 2 – Is their writing well/logically structured (at paragraphs and sentence level)? (3-point scale: 3 = Yes, 2 = To some extent (requires improvement), 1 = No / not enough)",
-    rules:[
-      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 2, your writing is clearly and logically structured at both paragraph and sentence level, which makes your ideas easy to follow." },
-      { when:v=>v===2, bucket:"improvements", text:"In Portfolio Part 2, the structure of your writing is partly clear, but some paragraphs or sentences could be organised more logically to support your message." },
-      { when:v=>v===1, bucket:"improvements", text:"In Portfolio Part 2, your overall structure is difficult to follow; work on clearer topic sentences, paragraphing and sentence-level organisation." }
-    ]},
-
-  { id:"mlo1_q3", mlo:"MLO1", type:"likert", min:1, max:3,
-    label:"In Portfolio Part 2 – Have references and citations been used? (3-point scale: 3 = Yes, to a good standard, 2 = To some extent (a reasonable attempt has been made), 1 = No / not enough)",
-    rules:[
-      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 2, you used references and in-text citations to a good standard, showing clear attempts to acknowledge your sources appropriately." },
-      { when:v=>v===2, bucket:"improvements", text:"In Portfolio Part 2, you made a reasonable attempt to use references and citations, but there are some gaps or inaccuracies that you could correct." },
-      { when:v=>v===1, bucket:"improvements", text:"In Portfolio Part 2, there was limited or no effective use of references and citations; work on applying the required referencing style more consistently." }
-    ]},
-
-  { id:"mlo1_q4", mlo:"MLO1", type:"likert", min:1, max:3,
-    label:"In Portfolio Part 3 – Has the student been able to successfully find and physically check out a relevant book from the library? (3-point scale: 3 = Yes, it is relevant and features in the video, 2 = To some extent (clearly referenced but not physically there, or physically there but not relevant), 1 = No)",
-    rules:[
-      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 3, you successfully found, checked out and used a relevant physical library book, and this was clearly shown in your video." },
-      { when:v=>v===2, bucket:"improvements", text:"In Portfolio Part 3, you engaged with a library book to some extent, but either its relevance or clear use in the video could be improved." },
-      { when:v=>v===1, bucket:"improvements", text:"In Portfolio Part 3, there was limited evidence that you had found and used a relevant physical library book; make sure you fully complete this step in future tasks." }
-    ]},
-
-  // MLO2 – Time management, communication, and digital literacy
-
-  { id:"mlo2_q5", mlo:"MLO2", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 3 – Has the student demonstrated effective time management in completing and presenting their work (timing and pacing of presentation)?",
-    rules:[
-      { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 3, you managed your time very effectively, with appropriate overall length and well-paced delivery throughout the presentation." },
-      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 3, your time management was adequate, though some sections could be paced more smoothly or balanced more evenly." },
-      { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 3, your time management was limited; work on planning your sections and pacing so that the presentation keeps to time and flows more smoothly." }
-    ]},
-
-  { id:"mlo2_q6", mlo:"MLO2", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 3 – Has the student communicated ideas clearly and confidently in their video presentation (speaking and presenting skills)?",
-    rules:[
-      { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 3, you communicated your ideas clearly and confidently, with engaging delivery and effective speaking skills." },
-      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 3, you communicated your ideas at an adequate level, though improving your confidence, clarity or use of emphasis could make the presentation stronger." },
-      { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 3, your spoken communication was limited at times; work on speaking more clearly, varying your tone and using eye contact or body language to engage the audience." }
-    ]},
-
-  // MLO3 – Notetaking & essay planning (Portfolio Part 1)
-
-  { id:"mlo3_q7", mlo:"MLO3", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 1 – Has the student produced clear, well-organised notes that show understanding of key ideas from the texts?",
+  // -------- Portfolio Part 1 (P1) --------
+  { id:"mlo3_q7", mlo:"MLO3", part:"P1", type:"likert", min:1, max:5,
+    label:"Has the student produced clear, well-organised notes that show understanding of key ideas from the texts?",
     rules:[
       { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 1, your notes were clear, well-organised and showed a strong understanding of key ideas from the texts." },
       { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 1, your notes showed an adequate understanding of the key ideas, though the layout or focus could be clearer." },
       { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 1, your notes were limited in clarity or organisation; consider using a more structured layout so that key points are easier to identify." }
     ]},
 
-  { id:"mlo3_q8", mlo:"MLO3", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 1 – Is there a clear link between the student’s notes and the rest of their essay plan?",
+  { id:"mlo3_q8", mlo:"MLO3", part:"P1", type:"likert", min:1, max:5,
+    label:"Is there a clear link between the student’s notes and the rest of their essay plan?",
     rules:[
       { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 1, you used your notes very effectively to inform your essay plan, with a clear link between what you noted and the points you plan to make." },
       { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 1, there was an adequate link between your notes and your essay plan, though some planned points could be more clearly based on the notes you made." },
       { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 1, the connection between your notes and your essay plan was limited; try to base your planned points more directly on the evidence and ideas in your notes." }
     ]},
 
-  { id:"mlo3_q9", mlo:"MLO3", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 1 – Has the student demonstrated the ability to prioritise key arguments and structure ideas coherently?",
+  { id:"mlo3_q9", mlo:"MLO3", part:"P1", type:"likert", min:1, max:5,
+    label:"Has the student demonstrated the ability to prioritise key arguments and structure ideas coherently?",
     rules:[
       { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 1, your essay plan showed excellent prioritising of key arguments and a coherent, logical structure." },
       { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 1, you identified the main arguments at an adequate level, though the overall order could be more coherent." },
       { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 1, your prioritising and structuring of ideas was limited; work on ordering your points so that they build logically on each other." }
     ]},
 
-  // MLO4 – Research, paraphrasing, and referencing
-
-  { id:"mlo4_q10", mlo:"MLO4", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 1 – Has the student located and selected appropriate academic sources to support their work?",
+  { id:"mlo4_q10", mlo:"MLO4", part:"P1", type:"likert", min:1, max:5,
+    label:"Has the student located and selected appropriate academic sources to support their work (Portfolio Part 1)?",
     rules:[
       { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 1, you selected appropriate academic sources to support your work and showed strong awareness of their relevance." },
       { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 1, you used academic sources at an adequate level, though you could evaluate their relevance or quality more clearly." },
       { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 1, your choice of academic sources was limited; try to identify more suitable and clearly relevant sources to support your argument." }
     ]},
 
-  { id:"mlo4_q11", mlo:"MLO4", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 2 – Has the student located and selected appropriate academic sources to support their work?",
+  // -------- Portfolio Part 2 (P2) --------
+  { id:"mlo4_q11", mlo:"MLO4", part:"P2", type:"likert", min:1, max:5,
+    label:"Has the student located and selected appropriate academic sources to support their work (Portfolio Part 2)?",
     rules:[
       { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 2, you chose appropriate academic sources that effectively support the points made in your writing." },
       { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 2, you used academic sources at an adequate level, though some sources could be more clearly relevant or better integrated into your argument." },
       { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 2, your use of academic sources was limited; work on choosing more suitable sources and linking them more clearly to your main points." }
     ]},
 
-  { id:"mlo4_q12", mlo:"MLO4", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 2 – Has the student paraphrased source material accurately and expressed ideas in their own words?",
+  { id:"mlo4_q12", mlo:"MLO4", part:"P2", type:"likert", min:1, max:5,
+    label:"Has the student paraphrased source material accurately and expressed ideas in their own words?",
     rules:[
       { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 2, your paraphrasing was accurate and showed a strong ability to express source ideas clearly in your own words." },
       { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 2, you paraphrased at an adequate level, though some sections were quite close to the original wording." },
       { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 2, your paraphrasing was limited; work on expressing ideas more fully in your own words to avoid copying the original text too closely." }
     ]},
 
-  // MLO5 – Reflection, goals, and self-awareness (Portfolio Part 3)
+  { id:"mlo1_q1", mlo:"MLO1", part:"P2", type:"likert", min:1, max:3,
+    label:"Does their writing show a high level of academic style (FOCUS)?",
+    scaleNote:"(3-point scale: 1 = No / not enough, 2 = To some extent (requires improvement), 3 = Yes.)",
+    rules:[
+      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 2, your writing shows a consistently high level of academic style, with an appropriately formal and academic tone." },
+      { when:v=>v===2, bucket:"improvements", text:"In Portfolio Part 2, your writing shows some features of academic style, but it needs further development to be consistently formal and discipline-appropriate." },
+      { when:v=>v===1, bucket:"improvements", text:"In Portfolio Part 2, there was limited evidence of appropriate academic style; work on using more formal language, clearer structure and avoiding conversational phrasing." }
+    ]},
 
-  { id:"mlo5_q13", mlo:"MLO5", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 3 – Has the student reflected thoughtfully on their personal learning experience?",
+  { id:"mlo1_q2", mlo:"MLO1", part:"P2", type:"likert", min:1, max:3,
+    label:"Is their writing well/logically structured (at paragraphs and sentence level)?",
+    scaleNote:"(3-point scale: 1 = No / not enough, 2 = To some extent (requires improvement), 3 = Yes.)",
+    rules:[
+      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 2, your writing is clearly and logically structured at both paragraph and sentence level, which makes your ideas easy to follow." },
+      { when:v=>v===2, bucket:"improvements", text:"In Portfolio Part 2, the structure of your writing is partly clear, but some paragraphs or sentences could be organised more logically to support your message." },
+      { when:v=>v===1, bucket:"improvements", text:"In Portfolio Part 2, your overall structure is difficult to follow; work on clearer topic sentences, paragraphing and sentence-level organisation." }
+    ]},
+
+  { id:"mlo1_q3", mlo:"MLO1", part:"P2", type:"likert", min:1, max:3,
+    label:"Have references and citations been used?",
+    scaleNote:"(3-point scale: 1 = No / not enough, 2 = To some extent (requires improvement), 3 = Yes.)",
+    rules:[
+      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 2, you used references and in-text citations to a good standard, showing clear attempts to acknowledge your sources appropriately." },
+      { when:v=>v===2, bucket:"improvements", text:"In Portfolio Part 2, you made a reasonable attempt to use references and citations, but there are some gaps or inaccuracies that you could correct." },
+      { when:v=>v===1, bucket:"improvements", text:"In Portfolio Part 2, there was limited or no effective use of references and citations; work on applying the required referencing style more consistently." }
+    ]},
+
+  // -------- Portfolio Part 3 (P3) --------
+  { id:"mlo1_q4", mlo:"MLO1", part:"P3", type:"likert", min:1, max:3,
+    label:"Has the student been able to successfully find and physically check out a relevant book from the library?",
+    scaleNote:"(3-point scale: 1 = No / not enough, 2 = To some extent (requires improvement), 3 = Yes.)",
+    rules:[
+      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 3, you successfully found, checked out and used a relevant physical library book, and this was clearly shown in your video." },
+      { when:v=>v===2, bucket:"improvements", text:"In Portfolio Part 3, you engaged with a library book to some extent, but either its relevance or clear use in the video could be improved." },
+      { when:v=>v===1, bucket:"improvements", text:"In Portfolio Part 3, there was limited evidence that you had found and used a relevant physical library book; make sure you fully complete this step in future tasks." }
+    ]},
+
+  { id:"mlo2_q5", mlo:"MLO2", part:"P3", type:"likert", min:1, max:5,
+    label:"Has the student demonstrated effective time management in completing and presenting their work (timing and pacing of presentation)?",
+    rules:[
+      { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 3, you managed your time very effectively, with appropriate overall length and well-paced delivery throughout the presentation." },
+      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 3, your time management was adequate, though some sections could be paced more smoothly or balanced more evenly." },
+      { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 3, your time management was limited; work on planning your sections and pacing so that the presentation keeps to time and flows more smoothly." }
+    ]},
+
+  { id:"mlo2_q6", mlo:"MLO2", part:"P3", type:"likert", min:1, max:5,
+    label:"Has the student communicated ideas clearly and confidently in their video presentation (speaking and presenting skills)?",
+    rules:[
+      { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 3, you communicated your ideas clearly and confidently, with engaging delivery and effective speaking skills." },
+      { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 3, you communicated your ideas at an adequate level, though improving your confidence, clarity or use of emphasis could make the presentation stronger." },
+      { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 3, your spoken communication was limited at times; work on speaking more clearly, varying your tone and using eye contact or body language to engage the audience." }
+    ]},
+
+  { id:"mlo5_q13", mlo:"MLO5", part:"P3", type:"likert", min:1, max:5,
+    label:"Has the student reflected thoughtfully on their personal learning experience?",
     rules:[
       { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 3, your reflection on your personal learning experience was thoughtful and insightful, showing strong awareness of your progress." },
       { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 3, your reflection was adequate, though you could explore your experiences and learning in more depth." },
       { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 3, your reflection was quite limited; try to examine what you learned, what challenged you and how you responded in more detail." }
     ]},
 
-  { id:"mlo5_q14", mlo:"MLO5", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 3 – Has the student identified relevant and realistic goals for future academic or professional development?",
+  { id:"mlo5_q14", mlo:"MLO5", part:"P3", type:"likert", min:1, max:5,
+    label:"Has the student identified relevant and realistic goals for future academic or professional development?",
     rules:[
       { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 3, you identified relevant and realistic goals that are clearly linked to your future academic or professional development." },
       { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 3, you set goals that were generally relevant, though they could be more specific or measurable." },
       { when:v=>v<=2, bucket:"improvements", text:"In Portfolio Part 3, your goals were quite general or unclear; work on making them more focused, realistic and measurable." }
     ]},
 
-  { id:"mlo5_q15", mlo:"MLO5", type:"likert", min:1, max:5,
-    label:"In Portfolio Part 3 – Has the student included any clear and specific steps to support future academic or professional development?",
+  { id:"mlo5_q15", mlo:"MLO5", part:"P3", type:"likert", min:1, max:5,
+    label:"Has the student included any clear and specific steps to support future academic or professional development?",
     rules:[
       { when:v=>v>=4, bucket:"strengths", text:"In Portfolio Part 3, you outlined clear and specific steps that will support your future academic or professional development." },
       { when:v=>v===3, bucket:"strengths", text:"In Portfolio Part 3, you described some steps for your future development, though these could be more detailed or time-bound." },
@@ -267,23 +382,22 @@ const QUESTIONS = [
 
 // --------------------------- Support services config -----------------------------
 const SUPPORT_TEXTS = [
-  "You can make use of the Skills Plus resources on ‘Reflection’ to support work on future reflective assessments: https://library.northumbria.ac.uk/skillsplus/reflection/what-is",
-  "You can make use of the EAP Foundation resources on ‘Reflection’ to support work on future reflective assessments: https://www.eapfoundation.com/studyskills/learningcycle/",
-  "You can make use of the EAP Foundation resources on ‘Action Planning’ for support with action planning in a structured way for future assessments: https://www.eapfoundation.com/studyskills/time/",
-  "You can make use of the information in the ‘Assessment’ folder on Blackboard ahead of future assessments to check you have fully understood all aspects of a task before submitting",
-  "Speak to your personal tutor for information about workshops and one-to-one sessions with the ACE team to support with academic skills",
-  "See the EF3020 reading list for useful books connected to personal development",
-  "You can use the resources and services of the Northumbria University Graduate Futures for further support on employability. https://northumbria.careercentre.me/Members",
-  "You can make use of the Library Learning Skills team to book one-to-one and group sessions to support in the future with academic skills: https://library.northumbria.ac.uk/develop-your-learning-skills"
+  "You can make use of the <a href=\"https://library.northumbria.ac.uk/skillsplus/reflection/what-is\" target=\"_blank\" rel=\"noopener noreferrer\">Skills Plus resources on ‘Reflection’</a> to support work on future reflective assessments.",
+  "You can make use of the <a href=\"https://www.eapfoundation.com/studyskills/learningcycle/\" target=\"_blank\" rel=\"noopener noreferrer\">EAP Foundation resources on ‘Reflection’</a> to support work on future reflective assessments.",
+  "You can make use of the <a href=\"https://www.eapfoundation.com/studyskills/time/\" target=\"_blank\" rel=\"noopener noreferrer\">EAP Foundation resources on ‘Action Planning’</a> for support with action planning in a structured way for future assessments.",
+  "You can make use of the information in the ‘Assessment’ folder on Blackboard ahead of future assessments to check you have fully understood all aspects of a task before submitting.",
+  "Speak to your personal tutor for information about workshops and one-to-one sessions with the ACE team to support with academic skills.",
+  "See the EF3020 reading list for useful books connected to personal development.",
+  "You can use the resources and services of <a href=\"https://northumbria.careercentre.me/Members\" target=\"_blank\" rel=\"noopener noreferrer\">Northumbria University Graduate Futures</a> for further support on employability.",
+  "You can make use of the <a href=\"https://library.northumbria.ac.uk/develop-your-learning-skills\" target=\"_blank\" rel=\"noopener noreferrer\">Library Learning Skills team</a> to book one-to-one and group sessions to support in the future with academic skills."
 ];
 
-// Mapping of checkbox → indices in SUPPORT_TEXTS
 const SUPPORT_CONFIG = {
-  reflect:       [0, 1],   // Help with reflecting (services 1 and 2)
-  actionPlan:    [2],      // Help with action planning (service 3)
-  assessments:   [3],      // Understanding the assessments (service 4)
-  academicSkills:[4, 7],   // Academic skills / writing (services 5 and 8)
-  career:        [5, 6]    // Degree/career planning (services 6 and 7)
+  reflect:       [0, 1],
+  actionPlan:    [2],
+  assessments:   [3],
+  academicSkills:[4, 7],
+  career:        [5, 6]
 };
 
 function buildSelectedServices() {
@@ -302,15 +416,6 @@ function buildSelectedServices() {
   const unique = [...new Set(indices)];
   return unique.map(i => SUPPORT_TEXTS[i]);
 }
-
-// --------------------------- MLO-specific slider notes ---------------------------
-const MLO_DESCRIPTORS = {
-  MLO1: "Focus: Portfolio Part 2 (academic style, structure, referencing) and a library book in Part 3.",
-  MLO2: "Focus: Portfolio Part 3 – timing, pacing and speaking/presenting skills.",
-  MLO3: "Focus: Portfolio Part 1 – quality of notes and how effectively they are used for essay planning.",
-  MLO4: "Focus: Portfolio Parts 1 and 2 – choice of academic sources, paraphrasing and referencing.",
-  MLO5: "Focus: Portfolio Part 3 – depth of reflection, goal setting and specific next steps."
-};
 
 // --------------------------- Build context into sections -------------------------
 function buildContextFromAnswers(answers, meta){
@@ -333,59 +438,80 @@ function buildContextFromAnswers(answers, meta){
   }
 
   return {
-    marker: meta.marker || "PH",
+    marker: meta.marker || "",
     services: meta.services || [],
     sections
   };
 }
 
-// --------------------------- Render questions automatically ----------------------
+// --------------------------- Render questions by Portfolio Part ------------------
 function renderQuestions(containerId="questions"){
   const root = document.getElementById(containerId);
   root.innerHTML = "";
-  const byMLO = QUESTIONS.reduce((acc,q)=>{ (acc[q.mlo] ??= []).push(q); return acc; },{});
-  Object.keys(byMLO).forEach(mlo=>{
+
+  const byPart = {};
+  QUESTIONS.forEach(q=>{
+    (byPart[q.part] ??= []).push(q);
+  });
+
+  const PART_ORDER = ["P1","P2","P3"];
+  const PART_TITLES = {
+    P1: "Portfolio Part 1 (20%) - Source Evaluation, Notetaking and Essay Planning",
+    P2: "Portfolio Part 2 (20%) - Academic Essay with References",
+    P3: "Portfolio Part 3 (60%) - Reflective Presentation with Library Book Justification"
+  };
+
+  PART_ORDER.forEach(part=>{
+    const qs = byPart[part];
+    if (!qs || qs.length === 0) return;
+
     const fs = document.createElement("fieldset");
-    const lg = document.createElement("legend"); lg.textContent = mlo; fs.appendChild(lg);
+    const lg = document.createElement("legend");
+    lg.textContent = PART_TITLES[part] || part;
+    fs.appendChild(lg);
 
-    if (MLO_DESCRIPTORS[mlo]){
-      const note = document.createElement("p");
-      note.className = "scale-note";
+    qs.forEach(q=>{
+      const row = document.createElement("div");
+      row.className = "row";
 
-      let scaleText;
-      if (mlo === "MLO1") {
-        scaleText = "Scale for these 4 questions: 3 = Yes, 2 = To some extent (requires improvement), 1 = No / not enough.";
-      } else {
-        scaleText = "Scale for these questions: 5 = Excellent, 3 = Adequate, 1 = Very limited.";
+      const lab = document.createElement("label");
+      const strong = document.createElement("strong");
+      strong.textContent = q.label;
+      lab.appendChild(strong);
+
+      if (q.scaleNote){
+        const sn = document.createElement("div");
+        sn.className = "inline-scale-note";
+        sn.innerHTML = "<em>" + q.scaleNote + "</em>";
+        lab.appendChild(sn);
       }
 
-      note.textContent = `${MLO_DESCRIPTORS[mlo]} ${scaleText}`;
-      fs.appendChild(note);
-    }
-
-    byMLO[mlo].forEach(q=>{
-      const row = document.createElement("div"); row.className="row";
-      const lab = document.createElement("label"); lab.textContent = q.label;
       const input = document.createElement("input");
-      input.type="range";
+      input.type = "range";
       input.min = q.min;
       input.max = q.max;
       input.value = Math.round((q.min + q.max) / 2);
       input.id = q.id;
       input.step = 1;
       input.setAttribute("aria-label", q.label);
+
       const val = document.createElement("strong");
       val.id = q.id + "_val";
+      val.style.marginLeft = "8px";
       val.textContent = input.value;
+
       input.addEventListener("input", ()=> val.textContent = input.value);
+
       row.appendChild(lab);
       row.appendChild(input);
       row.appendChild(val);
       fs.appendChild(row);
     });
+
     root.appendChild(fs);
   });
 }
+
 function readAnswers(){
   const answers = {};
   QUESTIONS.forEach(q=>{
@@ -404,12 +530,14 @@ document.addEventListener("DOMContentLoaded", ()=>{
     const answers = readAnswers();
     const services = buildSelectedServices();
     const meta = {
-      marker: (document.getElementById('marker')||{}).value || "PH",
+      marker: (document.getElementById('marker')||{}).value || "",
       services
     };
     const ctx = buildContextFromAnswers(answers, meta);
     const feedback = renderTemplate(DEFAULT_TEMPLATE, ctx);
-    document.getElementById('output').textContent = feedback;
+
+    // Render with HTML so bold and links work
+    document.getElementById('output').innerHTML = feedback;
 
     try{
       scormSet("cmi.core.lesson_status","completed");
@@ -432,17 +560,17 @@ document.addEventListener("DOMContentLoaded", ()=>{
 </script>
 </head>
 <body>
-  <h1>Feedback Generator</h1>
-  <p class="muted">Set the sliders, select support options, click <em>Generate</em>, then copy the feedback into your marking sheet.</p>
+  <h1>EF3020 - Academic Practice - Feedback Generator</h1>
+  <p class="muted">Work through Portfolio Part 1, 2 and 3 in order, set the sliders, choose support options, then click <em>Generate</em> and paste the feedback into your marking sheet.</p>
 
   <div class="meta">
-    <label>Marker <input id="marker" value="PH"></label>
+    <label>Marker <input id="marker" placeholder="Initials"></label>
   </div>
 
   <fieldset>
     <legend>Marking scales</legend>
     <ul class="scale-list">
-      <li><strong>3-point scale (MLO1_Q1–Q4):</strong> 3 = Yes / to a good standard, 2 = To some extent (requires improvement), 1 = No / not enough.</li>
+      <li><strong>3-point scale (selected questions):</strong> 1 = No / not enough, 2 = To some extent (requires improvement), 3 = Yes.</li>
       <li><strong>5-point scale (all other questions):</strong> 5 = Excellent, 4 = Good, 3 = Adequate, 2 = Weak, 1 = Very limited.</li>
     </ul>
   </fieldset>
@@ -481,7 +609,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   </fieldset>
 
   <div class="buttons">
-    <button id="generate">Generate</button>
+    <button id="generate">Generate feedback</button>
   </div>
 
   <fieldset>
